@@ -1,0 +1,5 @@
+duffy_rpm_pkgs:
+  - beanstalkd
+  - python3-virtualenv
+  - python3-pip
+  - git

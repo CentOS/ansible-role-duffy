@@ -1,1 +1,104 @@
 # Defaults tasks for role duffy
+
+- name: Importing specific distro variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+  tags:
+    - vars
+
+- import_role:
+    name: mysql
+
+- name: Setting up MySQL DB for duffy
+  mysql_db:
+    db: "{{ duffy_mysqldb_name }}"
+    state: present
+  tags:
+    - db
+- name: Granting mysql db right for duffy
+  mysql_user:
+    name: "{{ duffy_mysqldb_user }}"
+    password: "{{ duffy_mysqldb_pass }}"
+    priv: "{{ duffy_mysqldb_name }}.*:ALL"
+    state: present   
+  tags:
+    - db
+
+- name: Opening up Duffy firewal rule
+  include_role:
+    name: iptables
+    tasks_from: custom-policy
+  vars:
+    iptables_policy_name: duffy
+    iptables_protocol: tcp
+    iptables_port: "8080"
+    iptables_source: "0.0.0.0/0"
+  tags:
+    - iptables
+
+- name: Installing required rpm pkgs to run duffy code
+  yum: 
+    name: "{{ duffy_rpm_pkgs }}"
+    state: installed
+  tags:
+    - pkgs
+
+- name: Ensuring we have beanstalkd running and enabled
+  service:
+    name: beanstalkd
+    state: started
+    enabled: True
+  tags:
+    - service
+
+- name: Ensuring we have duffy user
+  user:
+    name: "{{ duffy_user }}"
+    comment: "Duffy App user"
+  tags:
+    - user 
+
+- name: Ensuring we have directories for Duffy
+  file:
+    state: directory
+    owner: "{{ duffy_user }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ duffy_app_basedir }}"
+    - "{{ duffy_python_venv_path }}"
+  tags:
+    - directories
+
+- name: Cloning/updating local duffy code from git
+  git:
+    repo: "{{ duffy_upstream_git_repo }}"
+    dest: "{{ duffy_app_basedir }}"
+    version: "{{ duffy_git_version }}"
+    force: yes
+  become_user: "{{ duffy_user }}"
+  become: True
+  tags:
+    - app
+
+- name: Install dependencies via pip
+  pip:
+    requirements: "{{ duffy_app_basedir }}/requirements.txt"
+    virtualenv: "{{ duffy_python_venv_path }}"
+    virtualenv_site_packages: yes
+  become_user: "{{ duffy_user }}"
+  become: True
+  tags:
+    - pip
+
+- name: Configuring duffy via template
+  template:
+    src: duffy.conf.j2
+    dest: /etc/duffy.conf
+    mode: 0640
+    owner: "{{ duffy_user }}"
+    group: "{{ duffy_user }}"
+  tags:
+    - template
+    - config

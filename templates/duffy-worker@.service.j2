@@ -1,0 +1,15 @@
+[Unit]
+Description=runs worker.py %I
+After=multi-user.target
+
+[Service]
+Type=idle
+User={{ duffy_user }}
+Group={{ duffy_user }}
+WorkingDirectory={{ duffy_app_basedir }}
+ExecStart={{ duffy_python_venv_path }}/bin/python {{ duffy_app_basedir }}/scripts/worker.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

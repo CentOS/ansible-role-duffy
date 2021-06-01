@@ -1,1 +1,20 @@
 # Defaults variables for role duffy
+# Duffy itself is on github, this role is used to just deploy and update it on server
+
+# MySQL settings
+duffy_mysqldb_name: duffy
+duffy_mysqldb_user: duffy
+duffy_mysqldb_pass: EtCMT4wdP77avst96M # of course change this for real deploy through inventory, just default generated one
+
+# Duffy Application settings
+# Unprivileged user that will run duffy
+duffy_user: duffy
+#where to create duffy python venv
+duffy_python_venv_path: /var/lib/duffy-venv/
+# where to deploy duffy code
+duffy_app_basedir: /var/lib/duffy
+# upstream duffy git repo
+duffy_upstream_git_repo: https://github.com/CentOS/duffy.git
+# duffy version/branch/commit/tag to use
+duffy_git_version: master
+
