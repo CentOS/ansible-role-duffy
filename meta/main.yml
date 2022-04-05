@@ -1,1 +1,6 @@
-# Defaults meta for role duffy
+---
+# Metadata for the duffy role
+
+dependencies:
+  - role: postgresql
+  - role: redis

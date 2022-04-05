@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Wrapper for the Duffy CLI tool living inside a Python virtual environment
+
+. "{{ duffy_venv }}/bin/activate"
+
+exec "{{ duffy_venv }}/bin/duffy" "$@"

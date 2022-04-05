@@ -1,5 +1,9 @@
-duffy_rpm_pkgs:
-  - beanstalkd
-  - python3-virtualenv
-  - python3-pip
-  - git
+---
+duffy_python_executable: python3.8
+duffy_python_pkgs:
+  - python38
+  - python38-devel
+  - python38-pip
+  - python38-pip-wheel
+  - python38-setuptools
+  - python38-setuptools-wheel

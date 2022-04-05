@@ -1,0 +1,24 @@
+---
+# PostgreSQL tasks specific to the duffy role
+
+- become_user: postgres
+  block:
+    - name: Create the duffy PostgreSQL user
+      postgresql_user:
+        name: "{{ duffy_db_user }}"
+        password: "{{ duffy_db_pass }}"
+        role_attr_flags: "NOCREATEDB,NOSUPERUSER,NOCREATEROLE"
+
+    - name: Create the duffy database
+      postgresql_db:
+        name: "{{ duffy_db_name }}"
+        owner: "{{ duffy_db_user }}"
+        encoding: UTF-8
+
+    - name: Verify DB user has the necessary privileges
+      postgresql_privs:
+        db: "{{ duffy_db_name }}"
+        type: database
+        privs: ALL
+        state: present
+        role: "{{ duffy_db_user }}"
