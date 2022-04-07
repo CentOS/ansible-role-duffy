@@ -15,3 +15,13 @@
   systemd:
     name: duffy-tasks.service
     state: restarted
+
+- name: restart_duffy
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - duffy-app.service
+    - duffy-metaclient.service
+    - duffy-tasks.service
+

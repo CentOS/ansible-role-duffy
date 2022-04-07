@@ -110,6 +110,7 @@
         group: duffy
         mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
       loop: "{{ duffy_config_files }}"
+      notify: restart_duffy
       tags:
         - config
         - files

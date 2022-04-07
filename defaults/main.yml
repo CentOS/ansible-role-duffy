@@ -59,7 +59,7 @@ duffy_tasks_expire_sessions_interval: 300
 duffy_database_sqlalchemy_sync_url: >-
   postgresql://{{ duffy_db_user }}:{{ duffy_db_pass }}@localhost/{{ duffy_db_name }}
 duffy_database_sqlalchemy_async_url: >-
-  postgresql+asyncio://{{ duffy_db_user }}:{{ duffy_db_pass }}@localhost/{{ duffy_db_name }}
+  postgresql+asyncpg://{{ duffy_db_user }}:{{ duffy_db_pass }}@localhost/{{ duffy_db_name }}
 
 # Default and max session lifetimes
 duffy_session_lifetime: "6h"
