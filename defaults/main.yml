@@ -1,20 +1,66 @@
-# Defaults variables for role duffy
-# Duffy itself is on github, this role is used to just deploy and update it on server
+---
+# Defaults variables for the duffy role
 
-# MySQL settings
-duffy_mysqldb_name: duffy
-duffy_mysqldb_user: duffy
-duffy_mysqldb_pass: EtCMT4wdP77avst96M # of course change this for real deploy through inventory, just default generated one
+duffy_app_version: 3.0.0a3
 
-# Duffy Application settings
-# Unprivileged user that will run duffy
-duffy_user: duffy
-#where to create duffy python venv
-duffy_python_venv_path: /var/lib/duffy-venv/
-# where to deploy duffy code
-duffy_app_basedir: /var/lib/duffy
-# upstream duffy git repo
-duffy_upstream_git_repo: https://github.com/CentOS/duffy.git
-# duffy version/branch/commit/tag to use
-duffy_git_version: master
+duffy_python_executable: python3
+duffy_python_pkgs:
+  - python3
+  - python3-devel
+  - python3-pip
+  - python3-setuptools
+duffy_dev_pkgs:
+  - gcc
+  - libpq-devel
+duffy_venv: /var/lib/duffy/venv
+duffy_tasks_schedule_filename: /var/lib/duffy/celerybeat-schedule
+duffy_config_files:
+  - 10_app
+  - 20_metaclient
+  - 30_logging
+  - 40_tasks
+  - 50_database
+  - 60_misc
+  - 70_nodepools
+  - 80_secrets
 
+# Database settings
+duffy_db_user: duffy
+duffy_db_name: duffy
+duffy_db_pass: "you should use a different password"
+
+## The following is used in the templates for the above configuration files.
+
+# The web API
+duffy_app_loglevel: "info"
+duffy_app_host: "127.0.0.1"
+duffy_app_port: 8080
+
+# The legacy metaclient
+duffy_metaclient_loglevel: "info"
+duffy_metaclient_host: "127.0.0.1"
+duffy_metaclient_port: 9090
+duffy_metaclient_dest: "http://127.0.0.1:8080"
+# Map API keys to usernames in the legacy API meta client
+duffy_metaclient_usermap: {}
+
+# The Celery task workers
+duffy_tasks_celery_broker_url: "redis://localhost:6379"
+duffy_tasks_celery_result_backend: "redis://localhost:6379"
+duffy_tasks_celery_worker_redirect_stdouts_level: "INFO"
+duffy_tasks_locking_url: "redis://localhost:6379"
+duffy_tasks_fill_pools_interval: 300
+duffy_tasks_expire_sessions_interval: 300
+
+# The Duffy database
+#
+# We use PostgreSQL which by default authenticates Unix users to database users
+# of the same name without requiring a password.
+duffy_database_sqlalchemy_sync_url: >-
+  postgresql://{{ duffy_db_user }}:{{ duffy_db_pass }}@localhost/{{ duffy_db_name }}
+duffy_database_sqlalchemy_async_url: >-
+  postgresql+asyncio://{{ duffy_db_user }}:{{ duffy_db_pass }}@localhost/{{ duffy_db_name }}
+
+# Default and max session lifetimes
+duffy_session_lifetime: "6h"
+duffy_session_lifetime_max: "12h"

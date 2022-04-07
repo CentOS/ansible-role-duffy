@@ -1,104 +1,166 @@
-# Defaults tasks for role duffy
+---
+# Main tasks for the duffy role
 
-- name: Importing specific distro variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
-  tags:
-    - vars
+- tags:
+    - duffy
+  block:
+    - name: Import distro-specific variables
+      include_vars: "{{ item }}"
+      register: included_file
+      failed_when: >-
+        included_file.ansible_included_var_files | length > 0 and not included_file.ansible_facts
+      loop:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+      tags:
+        - vars
 
-- import_role:
-    name: mysql
+    - name: Install packages needed for Duffy
+      package:
+        name: "{{ duffy_dev_pkgs + duffy_python_pkgs | list }}"
+        state: present
+      tags:
+        - pkgs
 
-- name: Setting up MySQL DB for duffy
-  mysql_db:
-    db: "{{ duffy_mysqldb_name }}"
-    state: present
-  tags:
-    - db
-- name: Granting mysql db right for duffy
-  mysql_user:
-    name: "{{ duffy_mysqldb_user }}"
-    password: "{{ duffy_mysqldb_pass }}"
-    priv: "{{ duffy_mysqldb_name }}.*:ALL"
-    state: present   
-  tags:
-    - db
+    - name: Create the duffy Unix user
+      user:
+        name: duffy
+        home: /home/duffy
+        generate_ssh_key: yes
+        local: yes
+      register: duffy_user
+      tags:
+        - users
 
-- name: Opening up Duffy firewal rule
-  include_role:
-    name: iptables
-    tasks_from: custom-policy
-  vars:
-    iptables_policy_name: duffy
-    iptables_protocol: tcp
-    iptables_port: "8080"
-    iptables_source: "0.0.0.0/0"
-  tags:
-    - iptables
+    - name: Perform SELinux-related changes
+      import_tasks: selinux.yml
+      tags:
+        - selinux
 
-- name: Installing required rpm pkgs to run duffy code
-  yum: 
-    name: "{{ duffy_rpm_pkgs }}"
-    state: installed
-  tags:
-    - pkgs
+    - name: Allow access to the Duffy web apps
+      include_role:
+        name: iptables
+        tasks_from: custom-policy
+      vars:
+        iptables_policy_name: "duffy-{{ item.key }}"
+        iptables_protocol: tcp
+        iptables_port: "{{ item.value }}"
+        iptables_source: "0.0.0.0/0"
+      loop: '{{ {"app": duffy_app_port, "metaclient": duffy_metaclient_port} | dict2items }}'
+      tags:
+        - iptables
 
-- name: Ensuring we have beanstalkd running and enabled
-  service:
-    name: beanstalkd
-    state: started
-    enabled: True
-  tags:
-    - service
+    # The postgresql (server) role is listed in the role metadata.
 
-- name: Ensuring we have duffy user
-  user:
-    name: "{{ duffy_user }}"
-    comment: "Duffy App user"
-  tags:
-    - user 
+    - name: Set up PostgreSQL client and Duffy database
+      import_tasks: postgresql.yml
+      tags:
+        - postgresql
 
-- name: Ensuring we have directories for Duffy
-  file:
-    state: directory
-    owner: "{{ duffy_user }}"
-    path: "{{ item }}"
-  with_items:
-    - "{{ duffy_app_basedir }}"
-    - "{{ duffy_python_venv_path }}"
-  tags:
-    - directories
+    - name: Install Duffy Python package
+      pip:
+        name: "duffy[tasks,postgresql,interactive,legacy,opennebula]"
+        version: ">=3.0.0a3"
+        virtualenv: "{{ duffy_venv }}"
+        virtualenv_command: "{{ duffy_python_executable }} -m venv"
+        virtualenv_python: "{{ duffy_python_executable }}"
+      tags:
+        - pkgs
 
-- name: Cloning/updating local duffy code from git
-  git:
-    repo: "{{ duffy_upstream_git_repo }}"
-    dest: "{{ duffy_app_basedir }}"
-    version: "{{ duffy_git_version }}"
-    force: yes
-  become_user: "{{ duffy_user }}"
-  become: True
-  tags:
-    - app
+    - become_user: duffy
+      tags:
+        - files
+      block:
+        - name: "Install ~/bin directory for the Duffy user"
+          file:
+            path: "/home/duffy/bin"
+            state: directory
+            mode: u=rwx,go=rx
 
-- name: Install dependencies via pip
-  pip:
-    requirements: "{{ duffy_app_basedir }}/requirements.txt"
-    virtualenv: "{{ duffy_python_venv_path }}"
-    virtualenv_site_packages: yes
-  become_user: "{{ duffy_user }}"
-  become: True
-  tags:
-    - pip
+        - name: Install the duffy command wrapper for the Duffy user
+          template:
+            src: "duffy.sh.j2"
+            dest: "/home/duffy/bin/duffy"
+            owner: duffy
+            group: duffy
+            follow: no
+            mode: u=rwx,go=rx
 
-- name: Configuring duffy via template
-  template:
-    src: duffy.conf.j2
-    dest: /etc/duffy.conf
-    mode: 0640
-    owner: "{{ duffy_user }}"
-    group: "{{ duffy_user }}"
-  tags:
-    - template
-    - config
+    - name: Create Duffy configuration directory
+      file:
+        path: /etc/duffy
+        state: directory
+      tags:
+        - files
+
+    - name: Create Duffy tasks schedule directory
+      file:
+        path: "{{ duffy_tasks_schedule_filename | dirname }}"
+        state: directory
+        owner: duffy
+        group: duffy
+      tags:
+        - files
+
+    - name: Install Duffy configuration files
+      template:
+        src: "config/{{ item }}.yaml.j2"
+        dest: "/etc/duffy/{{ item }}.yaml"
+        owner: root
+        group: duffy
+        mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
+      loop: "{{ duffy_config_files }}"
+      tags:
+        - config
+        - files
+
+    - name: Set up Duffy database schema
+      become_user: duffy
+      command: duffy setup-db
+      register: duffy_setup_db_out
+      changed_when: not duffy_setup_db_out.failed
+      failed_when: >-
+        duffy_setup_db_out.failed
+        and "Refusing to change database schema" not in duffy_setup_db_out.stderr
+      environment:
+        PATH: "/home/duffy/bin:{{ ansible_env.PATH }}"
+      tags:
+        - database
+
+    - tags:
+      - services
+      block:
+        - name: Install Duffy systemd services
+          template:
+            src: "systemd/{{ item }}.j2"
+            dest: "/etc/systemd/system/{{ item }}"
+          notify:
+            - "Restart {{ item }}"
+          register: install_systemd_services
+          loop:
+            - duffy-app.service
+            - duffy-metaclient.service
+            - duffy-tasks.service
+
+        - name: Install shared systemd environment file
+          template:
+            src: systemd/duffy.sysconfig.j2
+            dest: /etc/sysconfig/duffy
+          notify:
+            - Restart duffy-app.service
+            - Restart duffy-metaclient.service
+            - Restart duffy-tasks.service
+
+        - name: Let systemd know about new units
+          systemd:
+            daemon_reload: yes
+          when: install_systemd_services.changed
+
+        - name: Enable Duffy systemd services
+          systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - duffy-app.service
+            - duffy-metaclient.service
+            - duffy-tasks.service
