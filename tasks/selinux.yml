@@ -6,6 +6,7 @@
     name:
       - checkpolicy
       - policycoreutils
+      - python3-policycoreutils
     state: installed
   tags:
     - pkgs
