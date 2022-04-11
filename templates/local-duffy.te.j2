@@ -1,24 +1,27 @@
-module local-duffy 1.2;
+module local-duffy 1.3;
 
 require {
+        type devpts_t;
         type http_cache_port_t;
         type init_t;
         type postgresql_t;
         type postgresql_port_t;
+        type ptmx_t;
         type redis_port_t;
         type ssh_exec_t;
         type ssh_home_t;
-        type ptmx_t;
         class file { execute execute_no_trans open read };
-        class chr_file { read write };
+        class chr_file { ioctl open read write };
         class tcp_socket name_connect;
         class unix_stream_socket connectto;
 }
 
 #============= init_t ==============
+allow init_t devpts_t:chr_file open;
 allow init_t http_cache_port_t:tcp_socket name_connect;
 allow init_t postgresql_t:unix_stream_socket connectto;
 allow init_t postgresql_port_t:tcp_socket name_connect;
+allow init_t ptmx_t:chr_file { ioctl open read write };
 allow init_t redis_port_t:tcp_socket name_connect;
 allow init_t ssh_exec_t:file { execute execute_no_trans open read };
 allow init_t ssh_home_t:file { open read };
