@@ -195,9 +195,8 @@
               - tenant
               - create
               - --is-admin
-              - --ssh-key
-              - "{{ duffy_admin_ssh_key }}"
               - "{{ duffy_admin_tenant }}"
+              - "{{ duffy_admin_ssh_key }}"
           when: admin_tenant_exists.rc != 0
 
         - name: Set API key of admin tenant
