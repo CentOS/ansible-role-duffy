@@ -1,7 +1,11 @@
 ---
 # Defaults variables for the duffy role
 
-duffy_app_version: 3.0.0a3
+duffy_app_version: 3.0.0a6
+
+duffy_admin_tenant: admin
+duffy_admin_api_key: "please override this in production"
+duffy_admin_ssh_key: "please override this in production"
 
 duffy_python_executable: python3
 duffy_python_pkgs:
@@ -21,8 +25,10 @@ duffy_config_files:
   - 40_tasks
   - 50_database
   - 60_misc
-  - 70_nodepools
+  # Node pool configuration is installed from {{ filestore }}/duffy
+  # - 70_nodepools
   - 80_secrets
+duffy_node_pool_config_file: 70_nodepools.yml
 
 # Database settings
 duffy_db_user: duffy
