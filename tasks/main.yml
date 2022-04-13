@@ -119,7 +119,7 @@
         - name: Install Duffy node pool configuration
           copy:
             src: "{{ filestore }}/duffy/{{ duffy_node_pool_config_file }}"
-            dest: "/etc/duffy/70_nodepools.yml"
+            dest: "/etc/duffy/70_nodepools.yaml"
             owner: root
             group: duffy
             mode: "u=rw,go=r"
