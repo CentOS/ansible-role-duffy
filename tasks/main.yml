@@ -177,6 +177,8 @@
 
     - name: Ensure admin tenant exists and is configured properly
       become_user: duffy
+      environment:
+        PATH: "/home/duffy/bin:{{ ansible_env.PATH }}"
       tags:
         - admin-tenant
       block:
