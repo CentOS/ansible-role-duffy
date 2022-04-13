@@ -189,15 +189,20 @@
           changed_when: admin_tenant_exists.rc == 0
 
         - name: Create admin tenant
-          command: "duffy tenant create --is-admin {{ duffy_admin_tenant }}"
+          command:
+            argv:
+              - duffy
+              - tenant
+              - create
+              - --is-admin
+              - --ssh-key
+              - "{{ duffy_admin_ssh_key }}"
+              - "{{ duffy_admin_tenant }}"
           when: admin_tenant_exists.rc != 0
 
         - name: Set API key of admin tenant
           command: >-
             duffy tenant update {{ duffy_admin_tenant }} --api-key {{ duffy_admin_api_key }}
-          when: "duffy_admin_api_key != 'please override this in production'"
-
-        - name: Set SSH key of admin tenant
-          command: >-
-            duffy tenant update {{ duffy_admin_tenant }} --ssh-key {{ duffy_admin_ssh_key }}
-          when: "duffy_admin_ssh_key != 'please override this in production'"
+          when: >-
+            admin_tenant_exists.rc != 0
+            and duffy_admin_api_key != "please override this in production"
