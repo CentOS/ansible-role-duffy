@@ -102,17 +102,27 @@
         - files
 
     - name: Install Duffy configuration files
-      template:
-        src: "config/{{ item }}.yaml.j2"
-        dest: "/etc/duffy/{{ item }}.yaml"
-        owner: root
-        group: duffy
-        mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
-      loop: "{{ duffy_config_files }}"
       notify: restart_duffy
       tags:
         - config
         - files
+      block:
+        - name: Install templated Duffy configuration files
+          template:
+            src: "config/{{ item }}.yaml.j2"
+            dest: "/etc/duffy/{{ item }}.yaml"
+            owner: root
+            group: duffy
+            mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
+          loop: "{{ duffy_config_files }}"
+
+        - name: Install Duffy node pool configuration
+          copy:
+            src: "{{ filestore }}/duffy/{{ duffy_node_pool_config_file }}"
+            dest: "/etc/duffy/70_nodepools.yml"
+            owner: root
+            group: duffy
+            mode: "u=rw,go=r"
 
     - name: Set up Duffy database schema
       become_user: duffy
