@@ -157,9 +157,7 @@
             src: systemd/duffy.sysconfig.j2
             dest: /etc/sysconfig/duffy
           notify:
-            - Restart duffy-app.service
-            - Restart duffy-metaclient.service
-            - Restart duffy-tasks.service
+            - restart_duffy
 
         - name: Let systemd know about new units
           systemd:

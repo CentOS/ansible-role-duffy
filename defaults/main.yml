@@ -57,6 +57,8 @@ duffy_tasks_celery_worker_redirect_stdouts_level: "INFO"
 duffy_tasks_locking_url: "redis://localhost:6379"
 duffy_tasks_fill_pools_interval: 300
 duffy_tasks_expire_sessions_interval: 300
+duffy_tasks_loglevel: "info"
+duffy_tasks_concurrency: 100
 
 # The Duffy database
 #
