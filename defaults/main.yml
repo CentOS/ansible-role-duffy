@@ -72,3 +72,8 @@ duffy_database_sqlalchemy_async_url: >-
 # Default and max session lifetimes
 duffy_session_lifetime: "6h"
 duffy_session_lifetime_max: "12h"
+
+# Variables for delegated tasks
+# Which is the boot_server (ansible-role-boot-server) on which
+# we have tftp/ks directory (we need to grant duffy rights)
+duffy_boot_server: localhost
