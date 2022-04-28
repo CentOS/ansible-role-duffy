@@ -65,6 +65,8 @@
         virtualenv_command: "{{ duffy_python_executable }} -m venv"
       tags:
         - pkgs
+      notify:
+        - restart_duffy
 
     - become_user: duffy
       tags:
