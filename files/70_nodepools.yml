@@ -1,0 +1,71 @@
+---
+nodepools:
+  abstract:
+    mech-ansible:
+      max_parallel: 1
+      mechanism:
+        type: "ansible"
+        ansible:
+          topdir: "/var/lib/duffy/ansible"
+    opennebula:
+      type: "virtual"      
+      extends: "mech-ansible"
+      mechanism:
+        ansible:
+          provision:
+            playbook: "playbooks/adhoc-provision-onevm-ci.yml"
+            extra-vars:
+              one_vm_quantity: "{{ duffy_in.nodes | length }}"
+          deprovision:
+            playbook: "playbooks/adhoc-deprovision-onevm-ci.yml"      
+    physical:
+      extends: "mech-ansible"
+      reuse-nodes:
+        architecture: "{{ architecture }}"
+      mechanism:
+        ansible:
+          provision:
+            playbook: "playbooks/adhoc-deploy-ci-seamicro.yml"
+            extra-vars:
+              # duffy_in.nodes gets passed in as a list
+              node_name: "{{ duffy_in.nodes[0].hostname }}"
+          deprovision:
+            playbook: "playbooks/adhoc-deprovision-ci-seamicro.yml"
+            extra-vars:
+              # duffy_in.nodes gets passed in as a list
+              node_name: "{{ duffy_in.nodes[0].hostname }}"
+    physical-x86_64:
+      extends: physical
+      architecture: "x86_64"
+      fill-level: 2
+  concrete:
+    virtual-centos8stream-x86_64:
+      extends: "opennebula"      
+      architecture: "x86_64"
+      fill-level: 3      
+      mechanism:
+        ansible:
+          extra-vars:
+            one_template_name: "CentOS Stream 8 x86_64 tiny"
+    virtual-centos9stream-x86_64-small:
+      extends: "opennebula"      
+      architecture: "x86_64"
+      fill-level: 3      
+      mechanism:
+        ansible:
+          extra-vars:
+            one_template_name: "CentOS Stream 9 x86_64 small"
+    physical-centos8stream-x86_64:
+      extends: "physical-x86_64"
+      mechanism:
+        ansible:
+          extra-vars:
+            centos_dist: "8-stream"
+    physical-centos9stream-x86_64:
+      extends: "physical-x86_64"
+      fill-level: 2
+      mechanism:
+        ansible:
+          extra-vars:
+            centos_dist: "9-stream"    
+

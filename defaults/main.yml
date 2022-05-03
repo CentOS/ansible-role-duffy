@@ -28,7 +28,14 @@ duffy_config_files:
   # Node pool configuration is installed from {{ filestore }}/duffy
   # - 70_nodepools
   - 80_secrets
+
+# Some files will be distributed from {{ filestore }}/duffy
+# For ref/example, you'll find test files under files/ directory (unused)
 duffy_node_pool_config_file: 70_nodepools.yml
+# This next file is used to map legacy requests to new poolnames
+# You can check on arch or else and redirect to a new poolname in DB (existing in previous file)
+duffy_metaclient_poolmap_config_file: 21_metaclient_poolmap.yml
+
 
 # Database settings
 duffy_db_user: duffy
