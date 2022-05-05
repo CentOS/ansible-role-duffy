@@ -32,9 +32,6 @@ duffy_config_files:
 # Some files will be distributed from {{ filestore }}/duffy
 # For ref/example, you'll find test files under files/ directory (unused)
 duffy_node_pool_config_file: 70_nodepools.yml
-# This next file is used to map legacy requests to new poolnames
-# You can check on arch or else and redirect to a new poolname in DB (existing in previous file)
-duffy_metaclient_poolmap_config_file: 21_metaclient_poolmap.yml
 
 
 # Database settings
@@ -56,6 +53,16 @@ duffy_metaclient_port: 9090
 duffy_metaclient_dest: "http://127.0.0.1:8080"
 # Map API keys to usernames in the legacy API meta client
 duffy_metaclient_usermap: {}
+# Map incoming requests to specific existing pool
+# Attention, it's a raw jinja2 block that is inserted into ansible .j2 template !
+duffy_metaclient_poolmap: |
+ {%- raw %}
+      - arch: "^(aarch64|ppc64|ppc64le)$"
+        pool: "virtual-centos{{ ver | replace('-', '') }}-{{ arch }}-{{ flavor | default('medium') }}"
+      - arch: "x86_64"
+        pool: "virtual-centos{{ ver | replace('-', '') }}-{{ arch }}-{{ flavor | default('small') }}"
+ {% endraw %}
+
 
 # The Celery task workers
 duffy_tasks_celery_broker_url: "redis://localhost:6379"

@@ -1,6 +1,0 @@
-  poolmap:
-    - arch: "^(aarch64|ppc64|ppc64le)$"
-      pool: "virtual-centos{{ ver | replace('-', '') }}-{{ arch }}-{{ flavor | default('medium') }}"
-    - arch: "x86_64"
-      pool: "virtual-centos{{ ver | replace('-', '') }}-{{ arch }}-{{ flavor | default('small') }}"
-
