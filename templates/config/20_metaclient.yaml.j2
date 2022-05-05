@@ -5,6 +5,5 @@ metaclient:
   dest: "{{ duffy_metaclient_dest }}"
   usermap:
     {{ duffy_metaclient_usermap | to_nice_yaml(indent=4) }}
-  poolmap:
-{{ duffy_metaclient_poolmap }} 
+  poolmap:{{ duffy_metaclient_poolmap }} 
  
