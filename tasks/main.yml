@@ -126,14 +126,6 @@
             group: duffy
             mode: "u=rw,go=r"
 
-        - name: Install Duffy metaclient poolmap configuration
-          copy:
-            src: "{{ filestore }}/duffy/{{ duffy_metaclient_poolmap_config_file }}"
-            dest: "/etc/duffy/21_metaclient_poolmap.yaml"
-            owner: root
-            group: duffy
-            mode: "u=rw,go=r"
-
     - name: Set up Duffy database schema
       become_user: duffy
       command: duffy setup-db
