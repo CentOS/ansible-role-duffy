@@ -79,9 +79,9 @@ duffy_tasks_concurrency: 100
 # We use PostgreSQL which by default authenticates Unix users to database users
 # of the same name without requiring a password.
 duffy_database_sqlalchemy_sync_url: >-
-  postgresql://{{ duffy_db_user | urlencode() }}:{{ duffy_db_pass | urlencode() }}@localhost/{{ duffy_db_name | urlencode() }}
+  postgresql://{{ duffy_db_user | urlencode() |replace("/", "%2F") }}:{{ duffy_db_pass | urlencode() |replace("/", "%2F") }}@localhost/{{ duffy_db_name | urlencode() |replace("/", "%2F")}}
 duffy_database_sqlalchemy_async_url: >-
-  postgresql+asyncpg://{{ duffy_db_user | urlencode() }}:{{ duffy_db_pass | urlencode() }}@localhost/{{ duffy_db_name | urlencode() }}
+  postgresql+asyncpg://{{ duffy_db_user | urlencode() |replace("/", "%2F")}}:{{ duffy_db_pass | urlencode() |replace("/", "%2F")}}@localhost/{{ duffy_db_name | urlencode() |replace("/", "%2F")}}
 
 # Default and max session lifetimes
 duffy_session_lifetime: "6h"
