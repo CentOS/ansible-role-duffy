@@ -126,6 +126,12 @@
             group: duffy
             mode: "u=rw,go=r"
 
+        - name: Remove obsolete configuration files
+          file:
+            path: "/etc/duffy/{{ item }}.yaml"
+            state: absent
+          loop: "{{ duffy_config_files_remove }}"
+
     - name: Set up Duffy database schema
       become_user: duffy
       command: duffy setup-db
