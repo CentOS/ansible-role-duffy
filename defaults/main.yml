@@ -1,7 +1,7 @@
 ---
 # Defaults variables for the duffy role
 
-duffy_app_version: 3.0.0a6
+duffy_app_version: 3.0.0a11
 
 duffy_admin_tenant: admin
 duffy_admin_api_key: "please override this in production"
@@ -24,10 +24,14 @@ duffy_config_files:
   - 30_logging
   - 40_tasks
   - 50_database
-  - 60_misc
+  - 60_defaults
   # Node pool configuration is installed from {{ filestore }}/duffy
   # - 70_nodepools
   - 80_secrets
+
+# Obsolete configuration files which should be removed
+duffy_config_files_remove:
+  - 60_misc
 
 # Some files will be distributed from {{ filestore }}/duffy
 # For ref/example, you'll find test files under files/ directory (unused)
@@ -83,9 +87,9 @@ duffy_database_sqlalchemy_sync_url: >-
 duffy_database_sqlalchemy_async_url: >-
   postgresql+asyncpg://{{ duffy_db_user | urlencode() |replace("/", "%2F")}}:{{ duffy_db_pass | urlencode() |replace("/", "%2F")}}@localhost/{{ duffy_db_name | urlencode() |replace("/", "%2F")}}
 
-# Default and max session lifetimes
-duffy_session_lifetime: "6h"
-duffy_session_lifetime_max: "12h"
+# Default initial and maximum session lifetimes
+duffy_default_session_lifetime: "6h"
+duffy_default_session_lifetime_max: "12h"
 
 # Default node quota
 duffy_default_node_quota: 10
