@@ -220,16 +220,17 @@
             admin_tenant_exists.rc != 0
             and duffy_admin_api_key != "please override this in production"
  
-        - name: Ensuring duffy user can write to some directories for provisioning
-          acl:
-            entity: duffy
-            etype: user
-            path: "{{ item }}"
-            permissions: rwx
-            state: present
-          with_items:
-            - /var/lib/tftpboot/pxelinux.cfg/
-            - /var/www/html/ks/
-          delegate_to: "{{ duffy_boot_server }}"
-          tags:
-            - acls
+    - name: Ensuring duffy user can write to some directories for provisioning
+      acl:
+        entity: duffy
+        etype: user
+        path: "{{ item }}"
+        permissions: rwx
+        state: present
+      with_items:
+       - /var/lib/tftpboot/pxelinux.cfg/
+       - /var/www/html/ks/
+      delegate_to: "{{ duffy_boot_server }}"
+      tags:
+        - acls
+            

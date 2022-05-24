@@ -4,7 +4,7 @@
 duffy_app_version: 3.0.0a13
 
 duffy_admin_tenant: admin
-duffy_admin_api_key: "please override this in production"
+duffy_admin_api_key: "please override this in production"  # one can use `uuidgen` for this
 duffy_admin_ssh_key: "# please override this in production"
 
 duffy_python_executable: python3
