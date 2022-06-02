@@ -59,7 +59,7 @@
 
     - name: Install Duffy Python package
       pip:
-        name: "duffy[tasks,postgresql,interactive,legacy]"
+        name: "duffy[app,tasks,postgresql,dev-shell,legacy]"
         version: "=={{ duffy_app_version }}"
         virtualenv: "{{ duffy_venv }}"
         virtualenv_command: "{{ duffy_python_executable }} -m venv"
