@@ -5,7 +5,7 @@ After=network.target
 User=duffy
 Group=duffy
 EnvironmentFile=-/etc/sysconfig/duffy
-ExecStart={{ duffy_venv }}/bin/duffy $DUFFY_OPTS worker -B --schedule-filename {{ duffy_tasks_schedule_filename }} $DUFFY_TASKS_OPTS
+ExecStart={{ duffy_venv }}/bin/duffy $DUFFY_GLOBAL_OPTS $DUFFY_TASKS_GLOBAL_OPTS worker -B --schedule-filename {{ duffy_tasks_schedule_filename }} $DUFFY_TASKS_OPTS
 
 [Install]
 WantedBy=default.target
