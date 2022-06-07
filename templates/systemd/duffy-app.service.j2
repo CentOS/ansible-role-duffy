@@ -6,7 +6,7 @@ Requires=duffy-tasks.service
 User=duffy
 Group=duffy
 EnvironmentFile=-/etc/sysconfig/duffy
-ExecStart={{ duffy_venv }}/bin/duffy $DUFFY_OPTS serve $DUFFY_APP_OPTS
+ExecStart={{ duffy_venv }}/bin/duffy $DUFFY_GLOBAL_OPTS $DUFFY_APP_GLOBAL_OPTS serve $DUFFY_APP_OPTS
 
 [Install]
 WantedBy=default.target
