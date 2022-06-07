@@ -197,7 +197,7 @@
         - admin-tenant
       block:
         - name: Check if admin tenant exists
-          command: "duffy tenant show {{ duffy_admin_tenant }}"
+          command: "duffy admin show-tenant {{ duffy_admin_tenant }}"
           register: admin_tenant_exists
           failed_when: False
           changed_when: admin_tenant_exists.rc == 0
@@ -206,8 +206,8 @@
           command:
             argv:
               - duffy
-              - tenant
-              - create
+              - admin
+              - create-tenant
               - --is-admin
               - "{{ duffy_admin_tenant }}"
               - "{{ duffy_admin_ssh_key }}"
@@ -215,7 +215,7 @@
 
         - name: Set API key of admin tenant
           command: >-
-            duffy tenant update {{ duffy_admin_tenant }} --api-key {{ duffy_admin_api_key }}
+            duffy admin update-tenant  {{ duffy_admin_tenant }} --api-key {{ duffy_admin_api_key }}
           when: >-
             admin_tenant_exists.rc != 0
             and duffy_admin_api_key != "please override this in production"
