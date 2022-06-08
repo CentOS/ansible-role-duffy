@@ -1,7 +1,7 @@
 ---
 # Defaults variables for the duffy role
 
-duffy_app_version: 3.1.0
+duffy_app_version: 3.2.0
 
 duffy_admin_tenant: admin
 duffy_admin_api_key: "please override this in production"  # one can use `uuidgen` for this
