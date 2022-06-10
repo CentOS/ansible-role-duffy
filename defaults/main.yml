@@ -18,7 +18,7 @@ duffy_dev_pkgs:
   - libpq-devel
 duffy_venv: /var/lib/duffy/venv
 duffy_tasks_schedule_filename: /var/lib/duffy/celerybeat-schedule
-duffy_config_files:
+duffy_system_config_files:
   - 10_app
   - 20_metaclient
   - 30_logging
@@ -28,9 +28,11 @@ duffy_config_files:
   # Node pool configuration is installed from {{ filestore }}/duffy
   # - 70_nodepools
   - 80_secrets
+duffy_user_config_files:
+  - 00_client
 
 # Obsolete configuration files which should be removed
-duffy_config_files_remove:
+duffy_system_config_files_remove:
   - 60_misc
 
 # Some files will be distributed from {{ filestore }}/duffy

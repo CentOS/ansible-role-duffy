@@ -87,9 +87,17 @@
             follow: no
             mode: u=rwx,go=rx
 
-    - name: Create Duffy configuration directory
+    - name: Create Duffy system configuration directory
       file:
         path: /etc/duffy
+        state: directory
+      tags:
+        - files
+
+    - name: Create Duffy user configuration directory
+      become_user: duffy
+      file:
+        path: /home/duffy/.config/duffy
         state: directory
       tags:
         - files
@@ -109,14 +117,14 @@
         - config
         - files
       block:
-        - name: Install templated Duffy configuration files
+        - name: Install templated Duffy system configuration files
           template:
             src: "config/{{ item }}.yaml.j2"
             dest: "/etc/duffy/{{ item }}.yaml"
             owner: root
             group: duffy
             mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
-          loop: "{{ duffy_config_files }}"
+          loop: "{{ duffy_system_config_files }}"
 
         - name: Install Duffy node pool configuration
           copy:
@@ -126,11 +134,22 @@
             group: duffy
             mode: "u=rw,go=r"
 
-        - name: Remove obsolete configuration files
+        - name: Remove obsolete system configuration files
           file:
             path: "/etc/duffy/{{ item }}.yaml"
             state: absent
-          loop: "{{ duffy_config_files_remove }}"
+          loop: "{{ duffy_system_config_files_remove }}"
+
+        - name: Install templated Duffy user configuration files
+          become_user: duffy
+          template:
+            src: "config/{{ item }}.yaml.j2"
+            dest: "/home/duffy/.config/duffy/{{ item }}.yaml"
+            owner: duffy
+            group: duffy
+            # protect auth credentials
+            mode: "u=rw,go="
+          loop: "{{ duffy_user_config_files }}"
 
     - become_user: duffy
       tags:
