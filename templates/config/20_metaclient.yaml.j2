@@ -3,7 +3,6 @@ metaclient:
   host: "{{ duffy_metaclient_host }}"
   port: {{ duffy_metaclient_port }}
   dest: "{{ duffy_metaclient_dest }}"
-  usermap:
-    {{ duffy_metaclient_usermap | to_nice_yaml(indent=4) }}
+  usermap:{{ duffy_metaclient_usermap }}
   poolmap:{{ duffy_metaclient_poolmap }} 
  

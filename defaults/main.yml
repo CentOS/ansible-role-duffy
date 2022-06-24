@@ -56,7 +56,13 @@ duffy_metaclient_host: "127.0.0.1"
 duffy_metaclient_port: 9090
 duffy_metaclient_dest: "http://127.0.0.1:8080"
 # Map API keys to usernames in the legacy API meta client
-duffy_metaclient_usermap: {}
+duffy_metaclient_usermap: |
+ {%- raw %}
+     8e06b6e1-fb32-4348-9342-9509e7507a1e: tenant1
+     9e83132f-80e7-4404-a7a2-c71d296103b8: tenant2
+ {% endraw %}
+
+
 # Map incoming requests to specific existing pool
 # Attention, it's a raw jinja2 block that is inserted into ansible .j2 template !
 duffy_metaclient_poolmap: |
