@@ -233,4 +233,9 @@
       delegate_to: "{{ duffy_boot_server }}"
       tags:
         - acls
-            
+
+
+- name: Monitoring tasks
+  import_tasks: monitoring.yml
+  tags:
+    - monitoring

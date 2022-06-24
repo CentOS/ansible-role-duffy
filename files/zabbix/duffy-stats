@@ -1,0 +1,9 @@
+#!/bin/bash
+
+pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
+
+echo "[+] Available/Ready nodes per pool in Duffy: "
+for pool in $pool_names; do
+  echo [$pool]: $(echo "select count(*) from nodes where pool='${pool}' and state='ready' ;" | psql -A -t -U duffy duffy )
+done
+

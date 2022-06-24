@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This script will query Duffy DB to retrieve nodes in ready|deployed|provisioning state
+# and send to zabbix
+# Called by: cron
+# Managed by: Ansible (don't edit !)
+
+pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
+
+for pool in $pool_names; do
+  zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k duffy.nodes.ready.[${pool}] -o $(echo "select count(*) from nodes where pool='${pool}' and state='ready' ;" | psql -A -t -U duffy duffy ) >/dev/null
+  zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k duffy.nodes.deployed.[${pool}] -o $(echo "select count(*) from nodes where pool='${pool}' and state='deployed' ;" | psql -A -t -U duffy duffy ) >/dev/null
+  zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k duffy.nodes.provisioning.[${pool}] -o $(echo "select count(*) from nodes where pool='${pool}' and state='provisioning' ;" | psql -A -t -U duffy duffy ) >/dev/null
+done
+

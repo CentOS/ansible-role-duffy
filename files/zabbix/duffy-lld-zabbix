@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This script will query Duffy DB and retrieve automatically available pools
+# for each pool it will then create a Zabbix Low Level Discovery item 
+# Called by: cron
+# Managed by: Ansible (don't edit)
+
+
+# some variables
+duffy_lld_file="/etc/zabbix/duffy-lld"
+
+# Retrieve dynamically available duffy pools from DB
+pool_names=$(echo "select distinct pool from nodes order by pool ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
+
+# Initialize lld file 
+echo -en '- duffy.lld.pools { "data": [' > ${duffy_lld_file}
+# Parsing $pool_names and adding to json
+for pool in ${pool_names};do
+  printf " {\"{#DUFFY_POOL_NAME}\": \"${pool}\"}," >> ${duffy_lld_file}
+done
+# Removing last comma for json
+sed -i '$ s/,$//' ${duffy_lld_file}
+# Closing file
+printf ' ] }\n'>> ${duffy_lld_file}
+
+# Reporting pools to Zabbix
+zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -i ${duffy_lld_file} >/dev/null

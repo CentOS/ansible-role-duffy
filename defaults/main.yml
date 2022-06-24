@@ -104,3 +104,10 @@ duffy_default_node_quota: 10
 # Which is the boot_server (ansible-role-boot-server) on which
 # we have tftp/ks directory (we need to grant duffy rights)
 duffy_boot_server: localhost
+
+
+# Monitoring / Zabbix tasks
+duffy_zabbix_templates:
+  - Template CentOS Duffy
+duffy_zabbix_groups:
+  - CentOS CI

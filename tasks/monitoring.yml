@@ -1,0 +1,40 @@
+- name: Distributing needed scripts
+  copy:
+    src: "files/zabbix/{{ item }}"
+    dest: "/usr/libexec/centos/{{ item }}"
+    mode: 0750
+    owner: root
+  with_items:
+    - duffy-lld-zabbix
+    - duffy-zabbix-stats
+    - duffy-stats
+
+- name: Sending LLD items to zabbix
+  cron:
+    name: "Duffy Low-Level Discovery"
+    job: /usr/libexec/centos/duffy-lld-zabbix
+    minute: "*/10"
+    user: root
+
+- name: Sending Duffy Statistics to zabbix
+  cron:
+    name: "Duffy zabbix stats"
+    job: /usr/libexec/centos/duffy-zabbix-stats
+    minute: "*"
+    user: root
+
+
+
+- block:
+    - name: Configuring agent in Zabbix server
+      include_role:
+        name: zabbix-server
+        tasks_from: agent_config
+      vars:
+        zabbix_templates: "{{ duffy_zabbix_templates }}"
+        zabbix_groups: "{{ duffy_zabbix_groups }}"
+  delegate_to: "{{ zabbix_api_srv }}"  
+  tags:
+    - monitoring
+  when: zabbix_api_srv is defined
+    
