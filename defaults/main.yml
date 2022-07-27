@@ -62,7 +62,6 @@ duffy_metaclient_usermap: |
      9e83132f-80e7-4404-a7a2-c71d296103b8: tenant2
  {% endraw %}
 
-
 # Map incoming requests to specific existing pool
 # Attention, it's a raw jinja2 block that is inserted into ansible .j2 template !
 duffy_metaclient_poolmap: |
@@ -72,7 +71,6 @@ duffy_metaclient_poolmap: |
      - arch: "x86_64"
        pool: "virtual-centos{{ ver | replace('-', '') }}-{{ arch }}-{{ flavor | default('small') }}"
  {% endraw %}
-
 
 # The Celery task workers
 duffy_tasks_celery_broker_url: "redis://localhost:6379"
