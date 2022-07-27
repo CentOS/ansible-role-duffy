@@ -107,6 +107,7 @@ duffy_boot_server: localhost
 
 
 # Monitoring / Zabbix tasks
+duffy_monitoring: True
 duffy_zabbix_templates:
   - Template CentOS Duffy
 duffy_zabbix_groups:

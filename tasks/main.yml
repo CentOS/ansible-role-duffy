@@ -237,5 +237,6 @@
 
 - name: Monitoring tasks
   import_tasks: monitoring.yml
+  when: duffy_monitoring
   tags:
     - monitoring
