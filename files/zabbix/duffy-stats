@@ -2,8 +2,8 @@
 
 pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
 
-echo "[+] Available/Ready nodes per pool in Duffy: "
+echo "[+] Duffy Pool status : Ready | Deployed | Provisioning : "
 for pool in $pool_names; do
-  echo [$pool]: $(echo "select count(*) from nodes where pool='${pool}' and state='ready' ;" | psql -A -t -U duffy duffy )
+  echo [$pool]: $(echo -e \\t "") $(echo -n "select count(*) from nodes where pool='${pool}' and state='ready' ;" | psql -A -t -U duffy duffy ) $(echo -n "|") $(echo -n "select count(*) from nodes where pool='${pool}' and state='deployed' ;" | psql -A -t -U duffy duffy ) $(echo -n "|") $(echo "select count(*) from nodes where pool='${pool}' and state='provisioning' ;" | psql -A -t -U duffy duffy )
 done
 
