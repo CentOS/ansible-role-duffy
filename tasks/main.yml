@@ -118,6 +118,14 @@
             mode: "u=rw,g=r,o={{ ('secret' in item) | ternary('', 'r') }}"
           loop: "{{ duffy_config_files }}"
 
+        - name: Install specific duffy-tasks config
+          template:
+            src: "config/etc-duffy-tasks-overrides.yml.j2"
+            dest: "/etc/duffy-tasks-overrides.yml"
+            owner: duffy
+            group: duffy
+            mode: '0755'
+
         - name: Install Duffy node pool configuration
           copy:
             src: "{{ filestore }}/duffy/{{ duffy_node_pool_config_file }}"

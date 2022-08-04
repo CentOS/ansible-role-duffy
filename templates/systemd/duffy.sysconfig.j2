@@ -4,5 +4,5 @@ DUFFY_APP_GLOBAL_OPTS=--loglevel={{ duffy_app_loglevel }}
 DUFFY_APP_OPTS=
 DUFFY_METACLIENT_GLOBAL_OPTS=--loglevel={{ duffy_metaclient_loglevel }}
 DUFFY_METACLIENT_OPTS=
-DUFFY_TASKS_GLOBAL_OPTS=--loglevel={{ duffy_tasks_loglevel }}
+DUFFY_TASKS_GLOBAL_OPTS=--loglevel={{ duffy_tasks_loglevel }} -c /etc/duffy -c /etc/duffy-tasks-overrides.yml
 DUFFY_TASKS_OPTS=--concurrency={{ duffy_tasks_concurrency }}
