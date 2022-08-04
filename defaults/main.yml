@@ -21,7 +21,8 @@ duffy_tasks_schedule_filename: /var/lib/duffy/celerybeat-schedule
 duffy_config_files:
   - 10_app
   - 20_metaclient
-  - 30_logging
+  # Disabling logging as it's now controlled by duffy_{app,metaclient}_loglevel variables (see below)
+  # - 30_logging
   - 40_tasks
   - 50_database
   - 60_defaults
