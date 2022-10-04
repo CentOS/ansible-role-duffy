@@ -5,7 +5,7 @@
 # Called by: cron
 # Managed by: Ansible (don't edit !)
 
-pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
+pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort | egrep -v seamicro)
 
 for pool in $pool_names; do
   zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k duffy.nodes.ready.[${pool}] -o $(echo "select count(*) from nodes where pool='${pool}' and state='ready' ;" | psql -A -t -U duffy duffy ) >/dev/null

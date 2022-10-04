@@ -10,7 +10,7 @@
 duffy_lld_file="/etc/zabbix/duffy-lld"
 
 # Retrieve dynamically available duffy pools from DB
-pool_names=$(echo "select distinct pool from nodes order by pool ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort)
+pool_names=$(echo "select distinct pool from nodes order by pool ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort|egrep -v seamicro)
 
 # Initialize lld file 
 echo -en '- duffy.lld.pools { "data": [' > ${duffy_lld_file}
