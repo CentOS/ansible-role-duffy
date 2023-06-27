@@ -239,6 +239,7 @@
        - /var/lib/tftpboot/pxelinux.cfg/
        - /var/www/html/ks/
       delegate_to: "{{ duffy_boot_server }}"
+      when: duffy_metal_deploy
       tags:
         - acls
 

@@ -1,7 +1,7 @@
 ---
 # Defaults variables for the duffy role
 
-duffy_app_version: 3.3.5
+duffy_app_version: 3.3.7
 
 duffy_admin_tenant: admin
 duffy_admin_api_key: "please override this in production"  # one can use `uuidgen` for this
@@ -100,8 +100,10 @@ duffy_default_session_lifetime_max: "12h"
 duffy_default_node_quota: 10
 
 # Variables for delegated tasks
-# Which is the boot_server (ansible-role-boot-server) on which
+# Do we want to deploy metal (through kickstart/dhcp/tftp) and if so,
+# which is the boot_server (ansible-role-boot-server) on which
 # we have tftp/ks directory (we need to grant duffy rights)
+duffy_metal_deploy: False
 duffy_boot_server: localhost
 
 
