@@ -5,6 +5,11 @@
 # Called by: cron
 # Managed by: Ansible (don't edit !)
 
+# Let's first abuse this script to also check if nodes are stuck in provisioning mode for more than 20min and so update status to failed so that duffy-tasks would restart provisioning
+echo "UPDATE nodes SET state='failed' WHERE state='provisioning' AND created_at<now()-interval '20min';" | psql -q -U duffy duffy
+
+# Now let's query for existing pools and send data to zabbix
+
 pool_names=$(echo "select distinct pool from nodes ;" | psql -A -t -U duffy duffy | sed '/^$/d'|sort | egrep -v seamicro)
 
 for pool in $pool_names; do
