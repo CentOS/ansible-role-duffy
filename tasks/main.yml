@@ -87,6 +87,14 @@
             follow: no
             mode: u=rwx,go=rx
 
+        - name: Install the pool cleanup script
+          copy:
+            src: "remove-pool.sh"
+            dest: "/home/duffy/bin/remove-pool.sh"
+            owner: duffy
+            group: duffy
+            mode: u=rwx,go=rx
+
     - name: Create Duffy configuration directory
       file:
         path: /etc/duffy
