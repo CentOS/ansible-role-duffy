@@ -1,4 +1,4 @@
-module local-duffy 1.3;
+module centos-duffy 1.4;
 
 require {
         type devpts_t;
@@ -10,7 +10,8 @@ require {
         type redis_port_t;
         type ssh_exec_t;
         type ssh_home_t;
-        class file { execute execute_no_trans open read };
+        type tmp_t;
+        class file { execute execute_no_trans open read write };
         class chr_file { ioctl open read write };
         class tcp_socket name_connect;
         class unix_stream_socket connectto;
@@ -26,4 +27,5 @@ allow init_t redis_port_t:tcp_socket name_connect;
 allow init_t ssh_exec_t:file { execute execute_no_trans open read };
 allow init_t ssh_home_t:file { open read };
 allow init_t ptmx_t:chr_file { read write };
+allow init_t tmp_t:file { open read write };
 

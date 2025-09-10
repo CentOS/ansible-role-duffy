@@ -1,51 +1,6 @@
 ---
 # SELinux tasks for the duffy role
 
-- name: Install packages needed to build SELinux modules
-  package:
-    name:
-      - checkpolicy
-      - policycoreutils
-      - python3-policycoreutils
-    state: installed
-  tags:
-    - pkgs
-
-- name: Install directory for custom SELinux module
-  file:
-    path: "{{ duffy_venv }}/selinux"
-    state: directory
-  tags:
-    - files
-
-- name: Install SELinux module for Duffy to talk to Redis and PostgreSQL
-  template:
-    src: local-duffy.te.j2
-    dest: "{{ duffy_venv }}/selinux/local-duffy.te"
-  register: local_duffy_te_file
-  tags:
-    - files
-
-- name: Compile SELinux module for Duffy to talk to Redis and PostgreSQL
-  command:
-    chdir: "{{ duffy_venv }}/selinux"
-    cmd: checkmodule -M -m -o local-duffy.mod local-duffy.te
-  when: local_duffy_te_file.changed
-  register: checkmodule_out
-
-- name: Create installable SELinux module package for Duffy to talk to Redis and PostgreSQL
-  command:
-    chdir: "{{ duffy_venv }}/selinux"
-    cmd: semodule_package -o local-duffy.pp -m local-duffy.mod
-  when: checkmodule_out.changed
-  register: semodule_package_out
-
-- name: Install SELinux module package for Duffy to talk to Redis and PostgreSQL
-  command:
-    chdir: "{{ duffy_venv }}/selinux"
-    cmd: semodule -i local-duffy.pp
-  when: semodule_package_out.changed
-
 - name: Ensure files in virtualenv are executable by systemd
   sefcontext:
     target: "{{ duffy_venv }}(/.*)?"
@@ -74,3 +29,22 @@
   when:
     - ansible_selinux.status is defined
     - ansible_selinux.status == "enabled"
+
+- name: Distributing custom selinux policy file[s]
+  copy:
+    src: "selinux/{{ ansible_distribution_major_version }}/{{ item }}"
+    dest: "/etc/selinux/centos/{{ item }}"
+  with_items:
+    - centos-duffy.pp
+  register: sepolicy  
+  tags:
+    - selinux
+
+- name: Reloading selinux policy on change
+  shell: "/usr/sbin/semodule -u /etc/selinux/centos/{{ item.item }}"
+  with_items: "{{ sepolicy.results }}"
+  when: item.changed
+  no_log: True
+  tags:
+    - selinux
+    
